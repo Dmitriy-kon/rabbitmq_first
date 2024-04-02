@@ -6,7 +6,8 @@ import aiocron
 
 from chat.views import manager
 
-@aiocron.crontab("* * * * * */25", start=False)
+# @aiocron.crontab("* * * * * */25", start=False)
+@aiocron.crontab("*/5 * * * *", start=False)
 async def one_minute_message():
     data = json.dumps({
         "group_id": "group_1",
