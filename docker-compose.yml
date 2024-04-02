@@ -1,0 +1,24 @@
+version: '3'
+services:
+  rabbit:
+    image: rabbitmq:3.8-management
+    container_name: rabbit
+    ports:
+      - 15672:15672
+      - 5672:5672
+    volumes:
+      - rabbit:/var/lib/rabbitmq
+  
+  python_cont:
+    build: ./external_main
+    container_name: python_cont
+    command: uvicorn app:app --reload --host 0.0.0.0 --port 8000
+    ports:
+      - 8000:8000
+    volumes:
+      - ./external_main:/app
+    depends_on:
+      - rabbit
+
+volumes:
+  rabbit:

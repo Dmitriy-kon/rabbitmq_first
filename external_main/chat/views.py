@@ -1,49 +1,36 @@
-from channel_box import channel_groups
-from channel_box import ChannelEndpoint
+import json
+
+
 from starlette.endpoints import HTTPEndpoint
-from starlette.responses import HTMLResponse
+from starlette.responses import HTMLResponse, JSONResponse
+from starlette.websockets import WebSocket, WebSocketDisconnect
+
+from .connection_manager import ConectionManager
+from .html import html
 
 
-html = html = """
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>ws</title>
-    </head>
-    <body>
-        <h1>WebsocketChannelEndpoint</h1>
-        <form action="" onsubmit="sendMessage(event)">
-            <label>group_id: </label><input type="text" id="groupId" autocomplete="off" value="group_1"><br/>
-            <label>username: </label><input type="text" id="username" autocomplete="off" value="test_user1"><br/>       
-            <label>message: </label><input type="text" id="messageText" autocomplete="off" value="test_message1"><br/>
-            <button>Send</button>
-        </form>
-        <ul id='messages'>
-        </ul>
-        <script>
-            var ws = new WebSocket("ws://""" + "localhost:8000" + """/chat/chat_ws");
-            ws.onmessage = function(event) {
-                console.log('Message received %s', event.data)
-                var messages = document.getElementById('messages');
-                var message = document.createElement('li');
-                var data = JSON.parse(event.data);
-                message.innerHTML = `<strong>${data.username} :</strong> ${data.message}`;
-                messages.appendChild(message);
-            };
-            function sendMessage(event) {
-                var username = document.getElementById("username");
-                var group_id = document.getElementById("groupId");
-                var input = document.getElementById("messageText");
-                var data = {
-                    "group_id": group_id.value, 
-                    "username": username.value,
-                    "message": input.value,
-                };
-                console.log('Message send %s', data)
-                ws.send(JSON.stringify(data));
-                event.preventDefault();
-            }
-        </script>
-    </body>
-</html>
-"""
+manager = ConectionManager()
+
+
+async def chat_page(request):
+    # return JSONResponse({"hello": "world"})
+    return HTMLResponse(html)
+
+
+# async def user_message(scope, receive, send):
+#     websocket = WebSocket(scope=scope, receive=receive, send=send)
+async def user_message(websocket: WebSocket):
+    await manager.connect(websocket)
+    await manager.send_personal_message("Hello from server!", websocket)
+
+    try:
+        while True:
+            data = await websocket.receive_text()
+            data = json.loads(data)
+
+            # await manager.send_personal_message(f"Message text was: {data}", websocket)
+            await manager.send_json(data, websocket)
+
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
+        await manager.broadcast(f"Client disconnected: {websocket}")
