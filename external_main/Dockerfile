@@ -10,7 +10,8 @@ COPY ./requirements.txt /app
 
 RUN pip install -r requirements.txt
 RUN pip install aiormq
-RUN pip freeze > requirements.txt
 
 COPY . ./
+
+
 

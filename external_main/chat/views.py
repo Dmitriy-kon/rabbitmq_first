@@ -29,6 +29,7 @@ async def user_message(websocket: WebSocket):
         while True:
             data = await websocket.receive_text()
             data_json = json.loads(data)
+            await manager.register_user(websocket, data_json["username"])
 
             # await manager.send_personal_message(f"Message text was: {data}", websocket)
             await p_methods.send_message_to_queue(data)

@@ -8,9 +8,12 @@ async def send_message_to_queue(message: str):
     
     connection = await aiormq.connect("amqp://rabbit")
     channel = await connection.channel()
+    
     message_bytes = message.encode()
     
-    await channel.queue_declare(queue="test_queue")
+    # await channel.queue_declare(queue="external_messager:chat")
     await channel.basic_publish(
-        message_bytes, routing_key="internal_messager:test_chat",)
+        message_bytes, routing_key="internal_messager:test_chat")
+    
+    
     await connection.close()

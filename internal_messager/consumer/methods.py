@@ -1,8 +1,10 @@
-
+import asyncio
 import json
+
 from aiormq.abc import DeliveredMessage
 
-from .color_formatter import color_f
+from color_formatter import color_f
+from producer.methods import send_message_to_external_main
 
 async def simple_message(message: DeliveredMessage):
     print(f"{color_f.red}Message: {message.body}{color_f.default}")
@@ -13,10 +15,15 @@ async def simple_message_ack(message: DeliveredMessage):
 
 
 async def chat_massage(message: DeliveredMessage):
-    message_data = json.loads(message.body.decode())
-    message_data["message"] = message_data["message"][::-1]
+    await asyncio.sleep(0.5)
     
-    print(f"{color_f.red}Message: {message_data} and type {type(message_data)} was received and been acked{color_f.default}")
+    message_data_dict = json.loads(message.body.decode())
+    
+    print(f"{color_f.red}[ x ] Message: {message_data_dict} and type {type(message_data_dict)} was received and been acked{color_f.default}")
+    
+    message_data_dict["message"] = message_data_dict["message"][::-1]
+    
+    await send_message_to_external_main(message_data_dict)
     await message.channel.basic_ack(message.delivery.delivery_tag)
 
 
