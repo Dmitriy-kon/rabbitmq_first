@@ -23,4 +23,4 @@ class ConectionManager:
 
     async def broadcast_json(self, message: str):
         for connection in self.active_connections:
-            await connection.send_text(message)
+            await connection.send_json(message)
