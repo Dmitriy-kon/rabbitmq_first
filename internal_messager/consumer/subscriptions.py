@@ -6,7 +6,7 @@ from aiormq.exceptions import AMQPConnectionError
 
 from settings import AMQP_URI
 
-from .methods import simple_message, simple_message_ack, json_message
+from .methods import simple_message, simple_message_ack, json_message, chat_massage
 from .color_formatter import color_f
 
 
@@ -31,6 +31,10 @@ async def consumer_subs():
     message_queue_declared_json = await channel.queue_declare(
         "internal_messager:test_message_json", durable=False
     )
+    
+    message_queue_declared_chat = await channel.queue_declare(
+        "internal_messager:test_chat", durable=False
+    )
 
     await channel.basic_consume(
         message_queue_declared.queue, simple_message, no_ack=True
@@ -43,3 +47,8 @@ async def consumer_subs():
     await channel.basic_consume(
         message_queue_declared_json.queue, json_message, no_ack=False
     )
+    
+    await channel.basic_consume(
+        message_queue_declared_chat.queue, chat_massage, no_ack=False
+    )
+
