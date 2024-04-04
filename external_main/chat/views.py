@@ -1,8 +1,7 @@
 import json
 
 
-from starlette.endpoints import HTTPEndpoint
-from starlette.responses import HTMLResponse, JSONResponse
+from starlette.responses import HTMLResponse
 from starlette.websockets import WebSocket, WebSocketDisconnect
 
 from connection_manager import ConectionManager
@@ -32,7 +31,7 @@ async def user_message(websocket: WebSocket):
             await manager.register_user(websocket, data_json["username"])
 
             # await manager.send_personal_message(f"Message text was: {data}", websocket)
-            await p_methods.send_message_to_queue(data)
+            await p_methods.send_message_to_queue(data_json)
             await manager.send_json(data_json, websocket)
 
     except WebSocketDisconnect:

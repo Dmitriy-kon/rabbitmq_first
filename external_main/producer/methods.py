@@ -1,19 +1,22 @@
+import json
+
 import aiormq
 
 from color_formatter import color_f
 
-async def send_message_to_queue(message: str):
-    print(f"{color_f.green}[ x ] Message: {message} was sent to interal messager{color_f.default}")
+async def send_message_to_queue(message_dict: dict):
+    print(f"{color_f.green}[ x ] Message: {message_dict} was sent to interal messager from exernal{color_f.default}")
     
+    message_dict |= {"source": "external_main"}
+    out_message_bytes = json.dumps(message_dict).encode()
     
     connection = await aiormq.connect("amqp://rabbit")
     channel = await connection.channel()
     
-    message_bytes = message.encode()
     
     # await channel.queue_declare(queue="external_messager:chat")
     await channel.basic_publish(
-        message_bytes, routing_key="internal_messager:test_chat")
+        out_message_bytes, routing_key="internal_messager:chat_message")
     
     
     await connection.close()

@@ -6,7 +6,7 @@ from aiormq.exceptions import AMQPConnectionError
 
 from settings import AMQP_URI
 
-from .methods import simple_message, simple_message_ack, json_message, chat_massage
+from .methods import simple_message, simple_message_ack, chat_massage
 from color_formatter import color_f
 
 
@@ -21,10 +21,10 @@ async def consumer_subs():
     channel = await connection.channel()
     # await channel.basic_qos(prefetch_count=2)
 
-    print(f"{color_f.red}Connection was established{color_f.default}")
+    print(f"{color_f.red}Connection was established from consumer{color_f.default}")
 
     message_queue_declared_chat = await channel.queue_declare(
-        "internal_messager:test_chat", durable=True
+        "internal_messager:chat_message", durable=False
     )
 
     await channel.basic_consume(
