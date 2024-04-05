@@ -1,4 +1,5 @@
 import json
+import time
 
 import aiormq
 
@@ -6,7 +7,7 @@ from color_formatter import color_f
 from settings import AMQP_URI
 
 async def send_message_to_internal_messager(message_dict: dict):
-    print(f"{color_f.green}[ x ] Message: {message_dict} was sent to internal_messager{color_f.default}")
+    print(f"{color_f.green}[ x ] Message: {message_dict} was sent to internal_messager {time.time()}{color_f.default}")
     
     message_dict |= {"source": "internal_worker"}
     out_message_bytes = json.dumps(message_dict).encode()

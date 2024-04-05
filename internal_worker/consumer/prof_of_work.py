@@ -12,7 +12,7 @@ class Pow:
     def __init__(self, message, *args, **kwargs):
         self.message = message
     
-    async def proof_of_word(self, header, difficulty_bits):
+    def proof_of_word(self, header, difficulty_bits):
         targer = 2 ** (256-difficulty_bits)
         
         for nonce in range(self.MAX_NONCE):
@@ -28,7 +28,8 @@ class Pow:
         return nonce
     
     
-    async def calculate(self):
+        
+    def calculate(self):
         nonce = 0
         hash_result = ''
         
@@ -46,7 +47,7 @@ class Pow:
             
             new_block = self.message + hash_result
             
-            hash_result, nonce = await self.proof_of_word(new_block, difficulty_bits)
+            hash_result, nonce = self.proof_of_word(new_block, difficulty_bits)
             
             end_time = time.time()
             elapsed_time = end_time - start_time
