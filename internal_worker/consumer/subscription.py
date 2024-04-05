@@ -6,7 +6,7 @@ from aiormq.exceptions import AMQPConnectionError
 from color_formatter import color_f
 from settings import AMQP_URI
 
-from consumer.methods import pow_chat_message
+from consumer import handlers
 
 
 async def consumer_subs():
@@ -26,6 +26,6 @@ async def consumer_subs():
         durable=False
     )
     
-    await channel.basic_consume(pow_chat_massage_queue_declared.queue, pow_chat_message, no_ack=False)
+    await channel.basic_consume(pow_chat_massage_queue_declared.queue, handlers.pow_chat_message, no_ack=False)
     
     
